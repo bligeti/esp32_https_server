@@ -149,7 +149,7 @@ void HTTPConnection::closeConnection() {
  * This method will try to fill up the buffer with data from
  */
 int HTTPConnection::updateBuffer() {
-  if (!isClosed()) {
+  if (!isClosed()||canReadData()) {
 
     // If there is buffer data that has been marked as processed.
     // Some example is shown here:
