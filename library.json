@@ -5,7 +5,7 @@
   "repository":
   {
     "type": "git",
-    "url": "https://github.com/fhessel/esp32_https_server.git"
+    "url": "https://github.com/bligeti/esp32_https_server.git"
   },
   "license": "MIT",
   "version": "1.0.0",
