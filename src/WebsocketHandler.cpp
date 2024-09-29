@@ -250,5 +250,8 @@ void WebsocketHandler::send(uint8_t* data, uint16_t length, uint8_t sendType) {
 bool WebsocketHandler::closed() {
   return _receivedClose || _sentClose;
 }
+bool WebsocketHandler::initialized() {
+  return (_con != nullptr);
+}
 
 }
