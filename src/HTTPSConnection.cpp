@@ -81,7 +81,9 @@ void HTTPSConnection::closeConnection() {
     // correctly
     _connectionState = STATE_CLOSING;
   }
-
+  if (this->_wsHandler != nullptr) {
+    this->_wsHandler->onClose();
+  }
   // Try to tear down SSL while we are in the _shutdownTS timeout period or if an error occurred
   if (_ssl) {
     if(_connectionState == STATE_ERROR || SSL_shutdown(_ssl) == 0) {
