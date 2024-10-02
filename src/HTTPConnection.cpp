@@ -529,8 +529,7 @@ void HTTPConnection::loop() {
           }
 
           // Finally, after the handshake is done, we create the WebsocketHandler and change the internal state.
-          //if(websocketRequested) {
-		      if(websocketRequested &&resolvedResource.getMatchingNode()->_nodeType == WEBSOCKET) {
+		      if(websocketRequested && res.getStatusCode() ==  101 &&resolvedResource.getMatchingNode()->_nodeType == WEBSOCKET) {
             _wsHandler = ((WebsocketNode*)resolvedResource.getMatchingNode())->newHandler();
             _wsHandler->initialize(this);  // make websocket with this connection 
             _connectionState = STATE_WEBSOCKET;
