@@ -144,6 +144,7 @@ private:
   struct {
     std::string text = "";
     bool parsingFinished = false;
+    bool possiblenewlineoverflow=false;
   } _parserLine;
 
   // HTTP properties: Method, Request, Headers
