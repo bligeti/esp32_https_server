@@ -138,7 +138,7 @@ void HTTPConnection::closeConnection() {
   }
 
   if (_wsHandler != nullptr) {
-    HTTPS_LOGD("Free WS Handler");
+    HTTPS_LOGD("Free WS Handler in closeConnection()");
     _wsHandler->onClose(); 
     delete _wsHandler;
     _wsHandler = NULL;
@@ -207,7 +207,7 @@ int HTTPConnection::updateBuffer() {
         } else {
           // An error occured
           _connectionState = STATE_ERROR;
-          HTTPS_LOGE("An receive error occurred, FID=%d, code=%d", _socket, readReturnCode); 
+          HTTPS_LOGE("An receive error occured, FID=%d, SSL_error=%d", _socket, readReturnCode);
           closeConnection();
           return -1;
         }
@@ -239,6 +239,7 @@ bool HTTPConnection::canReadData() {
 
 size_t HTTPConnection::readBuffer(byte* buffer, size_t length) {
   updateBuffer();
+  if (isClosed()) return 0;
   size_t bufferSize = _bufferUnusedIdx - _bufferProcessed;
 
   if (length > bufferSize) {
@@ -304,6 +305,10 @@ void HTTPConnection::readLine(int lengthLimit) {
           raiseError(400, "Bad Request");
           return;
         }
+      } else if (_bufferProcessed+1 == _bufferUnusedIdx){
+		  //Look ahead was not possible so let it go for the next round
+          _parserLine.possiblenewlineoverflow = true;
+		  return;
       }
     } else {
       _parserLine.text += newChar;
@@ -390,7 +395,7 @@ void HTTPConnection::loop() {
         HTTPS_LOGI("Request: %s %s (FID=%d)", _httpMethod.c_str(), _httpResource.c_str(), _socket);
         _connectionState = STATE_REQUEST_FINISHED;
       }
-
+      if (_parserLine.possiblenewlineoverflow) _parserLine.possiblenewlineoverflow = false;
       break;
     case STATE_REQUEST_FINISHED: // Read headers
 
@@ -423,6 +428,10 @@ void HTTPConnection::loop() {
 
           _parserLine.parsingFinished = false;
           _parserLine.text = "";
+        }
+		if (_parserLine.possiblenewlineoverflow) {
+		  _parserLine.possiblenewlineoverflow = false;
+		  break;
         }
       }
 
@@ -483,7 +492,8 @@ void HTTPConnection::loop() {
 
           // Find the request handler callback
           HTTPSCallbackFunction * resourceCallback;
-          if (websocketRequested) {
+          if (websocketRequested && resolvedResource.getMatchingNode()->_nodeType == WEBSOCKET) {
+		  //if (websocketRequested) {
             // For the websocket, we use the handshake callback defined below
             resourceCallback = &handleWebsocketHandshake;
           } else {
@@ -519,7 +529,8 @@ void HTTPConnection::loop() {
           }
 
           // Finally, after the handshake is done, we create the WebsocketHandler and change the internal state.
-          if(websocketRequested) {
+          //if(websocketRequested) {
+		      if(websocketRequested &&resolvedResource.getMatchingNode()->_nodeType == WEBSOCKET) {
             _wsHandler = ((WebsocketNode*)resolvedResource.getMatchingNode())->newHandler();
             _wsHandler->initialize(this);  // make websocket with this connection 
             _connectionState = STATE_WEBSOCKET;
@@ -610,7 +621,7 @@ void HTTPConnection::loop() {
 bool HTTPConnection::checkWebsocket() {
   if(_httpMethod == "GET" &&
      !_httpHeaders->getValue("Host").empty() &&
-      _httpHeaders->getValue("Upgrade") == "websocket" &&
+      (_httpHeaders->getValue("Upgrade") == "websocket" || _httpHeaders->getValue("Upgrade") == "WebSocket")  &&
       _httpHeaders->getValue("Connection").find("Upgrade") != std::string::npos &&
      !_httpHeaders->getValue("Sec-WebSocket-Key").empty() &&
       _httpHeaders->getValue("Sec-WebSocket-Version") == "13") {
