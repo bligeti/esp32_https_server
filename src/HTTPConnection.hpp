@@ -107,6 +107,9 @@ protected:
     CSTATE_ACTIVE,
     CSTATE_CLOSED
   } _clientState;
+    
+    //Websocket connection
+  WebsocketHandler * _wsHandler;
 
 private:
   void raiseError(uint16_t code, std::string reason);
@@ -158,8 +161,6 @@ private:
   // Should we use keep alive
   bool _isKeepAlive;
 
-  //Websocket connection
-  WebsocketHandler * _wsHandler;
 
 };
 
