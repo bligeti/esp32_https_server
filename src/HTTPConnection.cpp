@@ -588,19 +588,20 @@ void HTTPConnection::loop() {
       break;
     case STATE_WEBSOCKET: // Do handling of the websocket
       refreshTimeout();  // don't timeout websocket connection
-      if(pendingBufferSize() > 0) {
+      //re-checking the _connectionState since it can change at pendingBufferSize()
+      if(pendingBufferSize() > 0 && !isClosed() ) {
         HTTPS_LOGD("Calling WS handler, FID=%d", _socket);
         _wsHandler->loop();
       }
 
       // If the client closed the connection unexpectedly
-      if (_clientState == CSTATE_CLOSED) {
+      if (_clientState == CSTATE_CLOSED && !isClosed()) {
         HTTPS_LOGI("WS lost client, calling onClose, FID=%d", _socket);
         _wsHandler->onClose();
       }
 
       // If the handler has terminated the connection, clean up and close the socket too
-      if (_wsHandler != nullptr){
+      if (!isClosed()){
         if (_wsHandler->closed() || _clientState == CSTATE_CLOSED) {
           HTTPS_LOGI("WS closed, freeing Handler, FID=%d", _socket);
           delete _wsHandler;

@@ -51,7 +51,6 @@ protected:
 private:
   // SSL context for this connection
   esp_tls_t * _ssl;
-  esp_tls_cfg_server_t * _cfg;
 };
 
 } /* namespace httpsserver */

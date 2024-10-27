@@ -5,7 +5,7 @@ namespace httpsserver {
 
 HTTPSConnection::HTTPSConnection(ResourceResolver * resResolver):
   HTTPConnection(resResolver) {
-  _ssl = esp_tls_init();
+  _ssl = NULL;
 }
 
 HTTPSConnection::~HTTPSConnection() {
@@ -26,21 +26,22 @@ int HTTPSConnection::initialize(int serverSocketID, esp_tls_cfg_server_t * cfgSr
   if (_connectionState == STATE_UNDEFINED) {
     // Let the base class connect the plain tcp socket
     int resSocket = HTTPConnection::initialize(serverSocketID, defaultHeaders);
-    HTTPS_LOGI("Cert len:%d, apn:%s\n",cfgSrv->servercert_bytes,cfgSrv->alpn_protos[0]);
+    HTTPS_LOGI("Cert len:%d, apn:%s",cfgSrv->servercert_bytes,cfgSrv->alpn_protos[0]);
     // Build up SSL Connection context if the socket has been created successfully
     if (resSocket >= 0) {
+      
+      _ssl = esp_tls_init();
+
+      if (!_ssl) {
+        HTTPS_LOGE("esp_tls_init failed. FID=%d", resSocket);
+        return -1;
+      }
+    
       int res=esp_tls_server_session_create(cfgSrv,resSocket,_ssl);
-      if (0==res) {
-        esp_tls_cfg_server_session_tickets_init(cfgSrv);
-        _cfg = cfgSrv;
-        // Bind SSL to the socket
-        if (ESP_OK == esp_tls_get_conn_sockfd(_ssl,&resSocket)) {
-            return resSocket;
-        } else {
-             HTTPS_LOGE("SSL_accept failed. Aborting handshake. FID=%d", resSocket);
-        }
+      if (res != 0) {
+        HTTPS_LOGE("esp_tls_server_session_create failed. FID=%d, Error=%d", resSocket, res);
       } else {
-        HTTPS_LOGE("SSL_new failed. Aborting handshake. Error=%d", res);
+        return resSocket;
       }
 
     } else {
@@ -76,7 +77,7 @@ void HTTPSConnection::closeConnection() {
   }
   // Try to tear down SSL while we are in the _shutdownTS timeout period or if an error occurred
   if (_ssl) {
-    esp_tls_cfg_server_session_tickets_free(_cfg);
+
     esp_tls_server_session_delete(_ssl);
     _ssl = NULL;
     _connectionState = STATE_ERROR;
