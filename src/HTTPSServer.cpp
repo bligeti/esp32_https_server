@@ -12,7 +12,7 @@ HTTPSServer::HTTPSServer(SSLCert * cert, const uint16_t port, const uint8_t maxC
 
 }
  
-  
+HTTPSServer::~HTTPSServer() {  
 }
 
 /**
