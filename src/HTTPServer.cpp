@@ -3,10 +3,11 @@
 namespace httpsserver {
 
 
-HTTPServer::HTTPServer(const uint16_t port, const uint8_t maxConnections, const in_addr_t bindAddress):
+HTTPServer::HTTPServer(const uint16_t port, const uint8_t maxConnections, const in_addr_t bindAddress, Stream &_stream):
   _port(port),
   _maxConnections(maxConnections),
-  _bindAddress(bindAddress) {
+  _bindAddress(bindAddress),
+  stream = &_stream; {
 
   // Create space for the connections
   _connections = new HTTPConnection*[maxConnections];
