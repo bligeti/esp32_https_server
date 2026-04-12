@@ -3,6 +3,10 @@
 
 #include "Arduino.h"
 
+namespace httpsserver {
+  extern Stream *HTTPS_LOG_STREAM;
+}
+
 // 1: Error
 // 2: Error + Warn
 // 3: Error + Warn + Info
@@ -13,31 +17,31 @@
 #endif
 
 #ifdef HTTPS_LOGTIMESTAMP
-  #define HTTPS_LOGTAG(LVL) stream->printf("[HTTPS:" LVL ":%10lu] ", millis())
+  #define HTTPS_LOGTAG(LVL) httpsserver::HTTPS_LOG_STREAM->printf("[HTTPS:" LVL ":%10lu] ", millis())
 #else
-  #define HTTPS_LOGTAG(LVL) stream->print("[HTTPS:" LVL "] ")
+  #define HTTPS_LOGTAG(LVL) httpsserver::HTTPS_LOG_STREAM->print("[HTTPS:" LVL "] ")
 #endif
 
 #if HTTPS_LOGLEVEL > 0
-  #define HTTPS_LOGE(...) HTTPS_LOGTAG("E");stream->printf(__VA_ARGS__);stream->println()
+  #define HTTPS_LOGE(...) HTTPS_LOGTAG("E");httpsserver::HTTPS_LOG_STREAM->printf(__VA_ARGS__);httpsserver::HTTPS_LOG_STREAM->println()
 #else
   #define HTTPS_LOGE(...) do {} while (0)
 #endif
 
 #if HTTPS_LOGLEVEL > 1
-  #define HTTPS_LOGW(...) HTTPS_LOGTAG("W");stream->printf(__VA_ARGS__);stream->println()
+  #define HTTPS_LOGW(...) HTTPS_LOGTAG("W");httpsserver::HTTPS_LOG_STREAM->printf(__VA_ARGS__);httpsserver::HTTPS_LOG_STREAM->println()
 #else
   #define HTTPS_LOGW(...) do {} while (0)
 #endif
 
 #if HTTPS_LOGLEVEL > 2
-  #define HTTPS_LOGI(...) HTTPS_LOGTAG("I");stream->printf(__VA_ARGS__);stream->println()
+  #define HTTPS_LOGI(...) HTTPS_LOGTAG("I");httpsserver::HTTPS_LOG_STREAM->printf(__VA_ARGS__);httpsserver::HTTPS_LOG_STREAM->println()
 #else
   #define HTTPS_LOGI(...) do {} while (0)
 #endif
 
 #if HTTPS_LOGLEVEL > 3
-  #define HTTPS_LOGD(...) HTTPS_LOGTAG("D");stream->printf(__VA_ARGS__);stream->println()
+  #define HTTPS_LOGD(...) HTTPS_LOGTAG("D");httpsserver::HTTPS_LOG_STREAM->printf(__VA_ARGS__);httpsserver::HTTPS_LOG_STREAM->println()
 #else
   #define HTTPS_LOGD(...) do {} while (0)
 #endif
