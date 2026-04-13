@@ -4,8 +4,8 @@ namespace httpsserver {
 
 constexpr const char * alpn_protos[] = { "http/1.1", NULL } ;
 
-HTTPSServer::HTTPSServer(SSLCert * cert, const uint16_t port, const uint8_t maxConnections, const in_addr_t bindAddress, Stream &_stream):
-  HTTPServer(port, maxConnections, bindAddress, &_stream),
+HTTPSServer::HTTPSServer(SSLCert * cert, const uint16_t port, const uint8_t maxConnections, const in_addr_t bindAddress, Stream logstream):
+  HTTPServer(port, maxConnections, bindAddress, logstream),
   _cert(cert) {
   // Configure runtime data
   _cfg = NULL;

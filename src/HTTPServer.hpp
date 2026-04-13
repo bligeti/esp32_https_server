@@ -29,7 +29,7 @@ namespace httpsserver {
  */
 class HTTPServer : public ResourceResolver {
 public:
-  HTTPServer(const uint16_t portHTTPS = 80, const uint8_t maxConnections = 8, const in_addr_t bindAddress = 0, Stream &_stream = Serial);
+  HTTPServer(const uint16_t portHTTPS = 80, const uint8_t maxConnections = 8, const in_addr_t bindAddress = 0, Stream logstram = Serial);
   virtual ~HTTPServer();
 
   uint8_t start();
@@ -70,7 +70,6 @@ protected:
   // Helper functions
   virtual int createConnection(int idx);
 
-  Stream* stream;
 };
 
 }
