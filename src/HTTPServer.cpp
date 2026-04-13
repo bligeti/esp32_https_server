@@ -2,7 +2,6 @@
 
 namespace httpsserver {
   Stream *HTTPS_LOG_STREAM = &Serial;
-}
 
 HTTPServer::HTTPServer(const uint16_t port, const uint8_t maxConnections, const in_addr_t bindAddress, Stream &logstream):
   _port(port),
