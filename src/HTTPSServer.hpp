@@ -30,7 +30,7 @@ namespace httpsserver {
  */
 class HTTPSServer : public HTTPServer {
 public:
-  HTTPSServer(SSLCert * cert, const uint16_t portHTTPS = 443, const uint8_t maxConnections = 4, const in_addr_t bindAddress = 0, const Stream &logstream = Serial);  
+  HTTPSServer(SSLCert * cert, const uint16_t portHTTPS = 443, const uint8_t maxConnections = 4, const in_addr_t bindAddress = 0, Stream &logstream = Serial);  
   virtual ~HTTPSServer();
 private:
   // Static configuration. Port, keys, etc. ====================

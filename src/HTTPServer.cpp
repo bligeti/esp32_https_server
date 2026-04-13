@@ -1,9 +1,10 @@
 #include "HTTPServer.hpp"
 
 namespace httpsserver {
-  //Stream *HTTPS_LOG_STREAM = &Serial;
+  Stream *HTTPS_LOG_STREAM = &Serial;
+}
 
-HTTPServer::HTTPServer(const uint16_t port, const uint8_t maxConnections, const in_addr_t bindAddress, const Stream &logstream):
+HTTPServer::HTTPServer(const uint16_t port, const uint8_t maxConnections, const in_addr_t bindAddress, Stream &logstream):
   _port(port),
   _maxConnections(maxConnections),
   _bindAddress(bindAddress){
